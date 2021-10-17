@@ -116,7 +116,7 @@ public class Godavari {
     }
 
     /***
-     * gets Valid Bank Nifty instruments to identify the slabs & strike prices to place order
+     * gets Valid Bank Nifty instruments to identify the slabs and strike prices to place order
      * @param kiteConnect
      * @return
      * @throws IOException
