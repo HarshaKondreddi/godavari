@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class GodavariUtil {
+
+    public static Logger logger = Logger.getLogger(GodavariUtil.class.getName());
 
     /***
      * Gets orders to execute for bank nifty on
@@ -25,6 +28,7 @@ public class GodavariUtil {
         List<Instrument> callInstruments = getValidInstrumentsForInstrumentType(instruments, "CE");
         List<Instrument> putInstruments = getValidInstrumentsForInstrumentType(instruments, "PE");
         String today = TimeUtil.getWeekDayName();
+        logger.info("Executing trades at : " + upperRange + " , " + lowerRange);
         switch (today) {
             case "THURSDAY" :
                 List<Instrument> instrumentsToPlace = new ArrayList<>();
@@ -38,7 +42,6 @@ public class GodavariUtil {
                 }
                 return OrderUtil.getOptionsSELLOrdersToPlace(instrumentsToPlace);
             default:
-
         }
         return null;
     }

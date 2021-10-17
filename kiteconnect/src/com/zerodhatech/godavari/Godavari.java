@@ -111,12 +111,16 @@ public class Godavari {
                         Double spotPrice = getSpotPrice(kiteConnect, "NSE", "NIFTY BANK");
                         Double basePrice = new BigDecimal(spotPrice / 1000).setScale(1, RoundingMode.HALF_UP).multiply(new BigDecimal(1000)).doubleValue();
                         List<OrderParams> orders = GodavariUtil.getBankNiftyValidOrders(basePrice, instruments);
+                        logger.info("Executing 2 orders: " + orders.get(0).getTradingsymbol() + " ," +
+                                orders.get(1).getTradingsymbol());
                         for (OrderParams orderParam : orders) {
                             kiteConnect.placeOrder(orderParam, "REGULAR");
                         }
                         return orders;
                     }
-                default:break;
+                default:
+                    logger.info("Today is not thursday, not executing any trades today...");
+                    break;
             }
         }
         return null;
