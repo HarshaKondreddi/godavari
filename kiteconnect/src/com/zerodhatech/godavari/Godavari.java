@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class Godavari {
 
@@ -25,9 +26,11 @@ public class Godavari {
     public static final String BANKNIFTY = "BANKNIFTY";
     public static List<String> validInstruments = Arrays.asList(BANKNIFTY);
     public static boolean IS_TRADE_COMPLETED_ON_THURSDAY;
+    public static Logger logger = Logger.getLogger(Godavari.class.getName());
 
     public static void main(String[] args) throws IOException, KiteException, ParseException, InterruptedException {
-        init();
+        String requestToken = args[0];
+        init(requestToken);
     }
 
     /***
@@ -36,11 +39,12 @@ public class Godavari {
      * @throws KiteException
      * @throws ParseException
      * @throws InterruptedException
+     * @param requestToken
      */
-    public static void init() throws IOException, KiteException, ParseException, InterruptedException {
+    public static void init(String requestToken) throws IOException, KiteException, ParseException, InterruptedException {
         KiteConnect kiteConnect = new KiteConnect(API_KEY);
         kiteConnect.setUserId(USER_ID);
-        User user = kiteConnect.generateSession("REQUEST_TOKEN", API_SECRET_KEY);
+        User user = kiteConnect.generateSession(requestToken, API_SECRET_KEY);
         ACCESS_TOKEN = user.accessToken;
         PUBLIC_TOKEN = user.publicToken;
         kiteConnect.setAccessToken(ACCESS_TOKEN);
@@ -54,7 +58,9 @@ public class Godavari {
         });
         while(true) {
             Thread.sleep(60000);
+            logger.info("executing trades");
             executeTrade(kiteConnect);
+            logger.info("checking existing positions");
             checkExistingPositions(kiteConnect);
         }
     }
@@ -79,6 +85,7 @@ public class Godavari {
                 }
             }
         }
+        logger.info("Found "+ positionsToBeExited.size() + " to be exited. Continuing to buy these positions");
         List<OrderParams> orders = OrderUtil.exitOptionsDetails(positionsToBeExited);
         for(OrderParams orderParam : orders) {
                         kiteConnect.placeOrder(orderParam, "REGULAR");
