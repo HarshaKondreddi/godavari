@@ -45,7 +45,7 @@ public class OrderUtil {
             orderParams.setExchange(NFO);
             orderParams.setTradingsymbol(position.getTradingSymbol());
             orderParams.setTransactionType("BUY");
-            orderParams.setQuantity(position.getNetQuantity());
+            orderParams.setQuantity(-1*position.getNetQuantity());
             orderParams.setOrderType("MARKET");
             orderParams.setProduct("NRML");
             orders.add(orderParams);

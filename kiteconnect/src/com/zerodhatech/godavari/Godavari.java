@@ -5,6 +5,7 @@ import com.zerodhatech.kiteconnect.kitehttp.SessionExpiryHook;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.*;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class Godavari {
@@ -30,7 +34,18 @@ public class Godavari {
 
     public static void main(String[] args) throws IOException, KiteException, ParseException, InterruptedException {
         String requestToken = args[0];
+        initialiseLogging();
         init(requestToken);
+    }
+
+    private static void initialiseLogging() {
+        try {
+            LogManager.getLogManager().readConfiguration(new FileInputStream("logging.properties"));
+            Handler fileHandler = new FileHandler("godavari.log", 2000, 5);
+            logger.addHandler(fileHandler);
+        } catch (SecurityException | IOException e1) {
+            e1.printStackTrace();
+        }
     }
 
     /***
@@ -88,8 +103,9 @@ public class Godavari {
         logger.info("Found "+ positionsToBeExited.size() + " to be exited. Continuing to buy these positions");
         List<OrderParams> orders = OrderUtil.exitOptionsDetails(positionsToBeExited);
         for(OrderParams orderParam : orders) {
-                        kiteConnect.placeOrder(orderParam, "REGULAR");
+//                        kiteConnect.placeOrder(orderParam, "REGULAR");
         }
+        logger.info("Orders to place are : {}" + orders);
         return orders;
     }
 
