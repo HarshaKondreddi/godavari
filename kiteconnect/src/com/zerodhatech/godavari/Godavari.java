@@ -87,14 +87,12 @@ public class Godavari {
         Map<String, List<Position>> openPositions = kiteConnect.getPositions();
         List<Position> positionsToBeExited = new ArrayList<>();
         Double stopLossPercent = Double.valueOf(FileUtil.getPropertyName("godavari.stoploss.percent"));
-        for(String key : openPositions.keySet()) {
-            List<Position> positions = openPositions.get(key);
-            logger.info("Active positions for the key: " + key + " are : " + positions);
-            for(Position position : positions) {
-                if(position.getNetQuantity() < 0 &&
-                        position.getLastPrice() >= position.getAveragePrice()*(1+stopLossPercent/100)) {
-                    positionsToBeExited.add(position);
-                }
+        List<Position> positions = openPositions.get("net");
+        logger.info("Active positions for the key: net are : " + positions);
+        for(Position position : positions) {
+            if(position.getNetQuantity() < 0 &&
+                    position.getLastPrice() >= position.getAveragePrice()*(1+stopLossPercent/100)) {
+                positionsToBeExited.add(position);
             }
         }
         logger.info("Found "+ positionsToBeExited.size() + " to be exited. Continuing to buy these positions");
