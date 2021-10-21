@@ -1,5 +1,6 @@
 package com.zerodhatech.models;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -70,38 +71,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "Position{" +
-                "product='" + product + '\'' +
-                ", exchange='" + exchange + '\'' +
-                ", sellValue=" + sellValue +
-                ", lastPrice=" + lastPrice +
-                ", unrealised=" + unrealised +
-                ", buyPrice=" + buyPrice +
-                ", sellPrice=" + sellPrice +
-                ", m2m=" + m2m +
-                ", tradingSymbol='" + tradingSymbol + '\'' +
-                ", netQuantity=" + netQuantity +
-                ", sellQuantity=" + sellQuantity +
-                ", realised=" + realised +
-                ", buyQuantity=" + buyQuantity +
-                ", netValue=" + netValue +
-                ", buyValue=" + buyValue +
-                ", multiplier=" + multiplier +
-                ", instrumentToken='" + instrumentToken + '\'' +
-                ", closePrice=" + closePrice +
-                ", pnl=" + pnl +
-                ", overnightQuantity=" + overnightQuantity +
-                ", buym2m=" + buym2m +
-                ", sellm2m=" + sellm2m +
-                ", dayBuyQuantity=" + dayBuyQuantity +
-                ", daySellQuantity=" + daySellQuantity +
-                ", dayBuyPrice=" + dayBuyPrice +
-                ", daySellPrice=" + daySellPrice +
-                ", dayBuyValue=" + dayBuyValue +
-                ", daySellValue=" + daySellValue +
-                ", value=" + value +
-                ", averagePrice=" + averagePrice +
-                '}';
+        return new Gson().toJson(this);
     }
 
     public String getProduct() {

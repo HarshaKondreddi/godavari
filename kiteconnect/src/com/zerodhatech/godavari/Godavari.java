@@ -4,8 +4,10 @@ import com.zerodhatech.kiteconnect.KiteConnect;
 import com.zerodhatech.kiteconnect.kitehttp.SessionExpiryHook;
 import com.zerodhatech.kiteconnect.kitehttp.exceptions.KiteException;
 import com.zerodhatech.models.*;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,38 +16,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class Godavari {
 
     public static String ACCESS_TOKEN;
     public static String PUBLIC_TOKEN;
-    public static String USER_ID = "USER_ID";
-    public static String API_KEY = "API_KEY";
-    public static String API_SECRET_KEY = "API_SECRET_KEY";
+    public static String USER_ID;
+    public static String API_KEY;
+    public static String API_SECRET_KEY;
 
     public static final String BANKNIFTY = "BANKNIFTY";
     public static List<String> validInstruments = Arrays.asList(BANKNIFTY);
     public static boolean IS_TRADE_COMPLETED_ON_THURSDAY;
-    public static Logger logger = Logger.getLogger(Godavari.class.getName());
+    public static Logger logger = LogManager.getLogger(Godavari.class.getName());
 
     public static void main(String[] args) throws IOException, KiteException, ParseException, InterruptedException {
-        String requestToken = args[0];
+        USER_ID = args[0];
+        API_KEY = args[1];
+        API_SECRET_KEY = args[2];
+        String requestToken = args[3];
+
         initialiseLogging();
         init(requestToken);
     }
 
     private static void initialiseLogging() {
-        try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream("logging.properties"));
-            Handler fileHandler = new FileHandler("godavari.log", 2000, 5);
-            logger.addHandler(fileHandler);
-        } catch (SecurityException | IOException e1) {
-            e1.printStackTrace();
-        }
+        DOMConfigurator.configure("log4j.xml");
     }
 
     /***
@@ -72,9 +68,9 @@ public class Godavari {
             }
         });
         while(true) {
-            Thread.sleep(60000);
-            logger.info("executing trades");
-            executeTrade(kiteConnect);
+            Thread.sleep(120000);
+//            logger.info("executing trades");
+//            executeTrade(kiteConnect);
             logger.info("checking existing positions");
             checkExistingPositions(kiteConnect);
         }
@@ -90,9 +86,10 @@ public class Godavari {
     private static List<OrderParams> checkExistingPositions(KiteConnect kiteConnect) throws IOException, KiteException {
         Map<String, List<Position>> openPositions = kiteConnect.getPositions();
         List<Position> positionsToBeExited = new ArrayList<>();
-        Long stopLossPercent = Long.valueOf(FileUtil.getPropertyName("godavari.stoploss.percent"));
+        Double stopLossPercent = Double.valueOf(FileUtil.getPropertyName("godavari.stoploss.percent"));
         for(String key : openPositions.keySet()) {
             List<Position> positions = openPositions.get(key);
+            logger.info("Active positions for the key: " + key + " are : " + positions);
             for(Position position : positions) {
                 if(position.getNetQuantity() < 0 &&
                         position.getLastPrice() >= position.getAveragePrice()*(1+stopLossPercent/100)) {
@@ -103,9 +100,9 @@ public class Godavari {
         logger.info("Found "+ positionsToBeExited.size() + " to be exited. Continuing to buy these positions");
         List<OrderParams> orders = OrderUtil.exitOptionsDetails(positionsToBeExited);
         for(OrderParams orderParam : orders) {
-//                        kiteConnect.placeOrder(orderParam, "REGULAR");
+                        kiteConnect.placeOrder(orderParam, "REGULAR");
         }
-        logger.info("Orders to place are : {}" + orders);
+        logger.info("Orders placed are : {}" + orders);
         return orders;
     }
 
