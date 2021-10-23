@@ -67,12 +67,16 @@ public class Godavari {
                 System.out.println("session expired");
             }
         });
-        while(true) {
-            Thread.sleep(120000);
+        try {
+            while (true) {
+                Thread.sleep(120000);
 //            logger.info("executing trades");
 //            executeTrade(kiteConnect);
-            logger.info("checking existing positions");
-            checkExistingPositions(kiteConnect);
+                logger.info("checking existing positions");
+                checkExistingPositions(kiteConnect);
+            }
+        } catch (Exception ex) {
+            logger.error("Error while executing the process" + ex.getMessage() + ex.getStackTrace());
         }
     }
 
